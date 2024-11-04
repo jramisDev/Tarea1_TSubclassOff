@@ -2,6 +2,7 @@
 
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Tarea1_TSubclassOff/Tarea1_TSubclassOffCharacter.h"
 
@@ -32,6 +33,21 @@ void ATeleportActor::BoxCollisionBeginOverlap(UPrimitiveComponent* OverlappedCom
 	if(ATarea1_TSubclassOffCharacter* Character = Cast<ATarea1_TSubclassOffCharacter>(OtherActor))
 	{
 		bTeleportingActor = true;
+		
+		if(SoundToPlay) UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundToPlay, GetActorLocation());
+		
+		if(NSTeleport)
+		{
+			UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
+												NSTeleport,
+												TeleportMesh,
+												NAME_None,
+												FVector(0.f),
+												FRotator(0.f),
+												EAttachLocation::Type::KeepRelativeOffset,
+												true);
+		}
+
 		Character->FadeInOutCamera();
 		Character->SetActorLocationAndRotation(TeleportDestination->GetActorLocation(), TeleportDestination->GetActorRotation());
 	}
@@ -46,6 +62,7 @@ void ATeleportActor::BoxCollisionEndOverlap(UPrimitiveComponent* OverlappedCompo
 	}
 }
 
+#if WITH_EDITOR
 void ATeleportActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -59,3 +76,4 @@ void ATeleportActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 		}
 	}
 }
+#endif
