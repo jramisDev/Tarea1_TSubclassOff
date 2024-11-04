@@ -28,7 +28,9 @@ void ATeleportActor::BoxCollisionBeginOverlap(UPrimitiveComponent* OverlappedCom
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if(bTeleportingActor) return;
-	if(!TeleportDestination) return;	
+	if(!TeleportDestination) return;
+	if(ListTeleportClass.IsEmpty()) return;
+	if(!ListTeleportClass.Contains(OtherActor->GetClass())) return;
 	
 	bTeleportingActor = true;
 
@@ -46,7 +48,7 @@ void ATeleportActor::BoxCollisionBeginOverlap(UPrimitiveComponent* OverlappedCom
 											true);
 	}
 
-	if(ATarea1_TSubclassOffCharacter* Character = Cast<ATarea1_TSubclassOffCharacter>(OtherActor))
+	if(const ATarea1_TSubclassOffCharacter* Character = Cast<ATarea1_TSubclassOffCharacter>(OtherActor))
 	{
 		Character->FadeInOutCamera();
 	}

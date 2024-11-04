@@ -13,6 +13,9 @@ UCLASS()
 class TAREA1_TSUBCLASSOFF_API ATeleportActor : public AActor
 {
 	GENERATED_BODY()
+	
+	UPROPERTY(BlueprintReadWrite, Category="Teleport", meta=(AllowPrivateAccess=true))
+	bool bTeleportingActor;
 
 public:
 	ATeleportActor();
@@ -20,8 +23,8 @@ public:
 	UPROPERTY(EditInstanceOnly, Category="Teleport")
 	ATeleportActor* TeleportDestination;
 
-	UPROPERTY(BlueprintReadWrite, Category="Teleport")
-	bool bTeleportingActor;
+	UPROPERTY(EditInstanceOnly, Category="Teleport")
+	TArray<TSubclassOf<AActor>> ListTeleportClass;
 	
 	UFUNCTION(BlueprintCallable, Category="Teleport")
 	void BoxCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
