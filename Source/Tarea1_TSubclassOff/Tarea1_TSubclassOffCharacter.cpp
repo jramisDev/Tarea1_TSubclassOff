@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -58,6 +59,18 @@ void ATarea1_TSubclassOffCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+}
+
+void ATarea1_TSubclassOffCharacter::FadeInOutCamera() const
+{
+	if (!GetWorld()) return;
+	
+	APlayerCameraManager* PlayerCameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+	if(PlayerCameraManager)
+	{
+		PlayerCameraManager->StartCameraFade(0.f, 1.f, 0.5f, FColor::Blue);
+		PlayerCameraManager->StartCameraFade(1.f, 0.f, 0.5f, FColor::Blue);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

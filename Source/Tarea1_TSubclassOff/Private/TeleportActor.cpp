@@ -11,7 +11,6 @@ ATeleportActor::ATeleportActor()
 	PrimaryActorTick.bCanEverTick = true;
 
 	TeleportMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Teleport Mesh"));	
-	// TeleportMesh->SetWorldRotation(FRotator{90.f,0.f,0.f});
 	RootComponent = TeleportMesh;
 
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collision"));
@@ -33,6 +32,7 @@ void ATeleportActor::BoxCollisionBeginOverlap(UPrimitiveComponent* OverlappedCom
 	if(ATarea1_TSubclassOffCharacter* Character = Cast<ATarea1_TSubclassOffCharacter>(OtherActor))
 	{
 		bTeleportingActor = true;
+		Character->FadeInOutCamera();
 		Character->SetActorLocationAndRotation(TeleportDestination->GetActorLocation(), TeleportDestination->GetActorRotation());
 	}
 }
