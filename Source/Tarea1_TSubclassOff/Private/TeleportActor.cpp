@@ -2,6 +2,7 @@
 
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Tarea1_TSubclassOff/Tarea1_TSubclassOffCharacter.h"
 
 
@@ -23,45 +24,38 @@ ATeleportActor::ATeleportActor()
 	ArrowDirection->SetupAttachment(TeleportMesh);
 }
 
-void ATeleportActor::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-void ATeleportActor::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
 void ATeleportActor::BoxCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if(bTeleportingActor) return;
+	if(!TeleportDestination) return;	
 	
-	UE_LOG(LogTemp, Display, TEXT("ORIGEN TEST1"));
 	if(ATarea1_TSubclassOffCharacter* Character = Cast<ATarea1_TSubclassOffCharacter>(OtherActor))
 	{
-		UE_LOG(LogTemp, Display, TEXT("ORIGEN TEST2"));
-		if(TeleportDestination)
-		{
-			UE_LOG(LogTemp, Display, TEXT("ORIGEN TEST3"));
-			if(!bTeleportingActor)
-			{
-				bTeleportingActor = true;
-				Character->SetActorLocationAndRotation(TeleportDestination->GetActorLocation(), TeleportDestination->GetActorRotation());
-			}
-		}
+		bTeleportingActor = true;
+		Character->SetActorLocationAndRotation(TeleportDestination->GetActorLocation(), TeleportDestination->GetActorRotation());
 	}
 }
 
 void ATeleportActor::BoxCollisionEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	UE_LOG(LogTemp, Display, TEXT("DESTINO TEST1"));
 	if(ATarea1_TSubclassOffCharacter* Character = Cast<ATarea1_TSubclassOffCharacter>(OtherActor))
 	{
-		UE_LOG(LogTemp, Display, TEXT("DESTINO TEST2"));
 		bTeleportingActor = false;
+	}
+}
+
+void ATeleportActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	if(PropertyChangedEvent.GetPropertyName().IsEqual(GET_MEMBER_NAME_CHECKED(ATeleportActor, TeleportDestination)))
+	{
+		if(TeleportDestination)
+		{
+			SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TeleportDestination->GetActorLocation()));
+			TeleportDestination->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(TeleportDestination->GetActorLocation(), GetActorLocation()));
+		}
 	}
 }
