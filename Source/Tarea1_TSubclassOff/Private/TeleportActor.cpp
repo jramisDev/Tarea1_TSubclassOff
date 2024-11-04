@@ -30,36 +30,34 @@ void ATeleportActor::BoxCollisionBeginOverlap(UPrimitiveComponent* OverlappedCom
 	if(bTeleportingActor) return;
 	if(!TeleportDestination) return;	
 	
+	bTeleportingActor = true;
+
+	if(SoundToPlay) UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundToPlay, GetActorLocation());
+	
+	if(NSTeleport)
+	{
+		UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
+											NSTeleport,
+											TeleportMesh,
+											NAME_None,
+											FVector(0.f),
+											FRotator(0.f),
+											EAttachLocation::Type::KeepRelativeOffset,
+											true);
+	}
+
 	if(ATarea1_TSubclassOffCharacter* Character = Cast<ATarea1_TSubclassOffCharacter>(OtherActor))
 	{
-		bTeleportingActor = true;
-		
-		if(SoundToPlay) UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundToPlay, GetActorLocation());
-		
-		if(NSTeleport)
-		{
-			UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
-												NSTeleport,
-												TeleportMesh,
-												NAME_None,
-												FVector(0.f),
-												FRotator(0.f),
-												EAttachLocation::Type::KeepRelativeOffset,
-												true);
-		}
-
 		Character->FadeInOutCamera();
-		Character->SetActorLocationAndRotation(TeleportDestination->GetActorLocation(), TeleportDestination->GetActorRotation());
 	}
+	
+	OtherActor->SetActorLocationAndRotation(TeleportDestination->GetActorLocation(), TeleportDestination->GetActorRotation());
 }
 
 void ATeleportActor::BoxCollisionEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if(ATarea1_TSubclassOffCharacter* Character = Cast<ATarea1_TSubclassOffCharacter>(OtherActor))
-	{
-		bTeleportingActor = false;
-	}
+	bTeleportingActor = false;
 }
 
 #if WITH_EDITOR
