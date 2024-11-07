@@ -1,5 +1,6 @@
 ﻿#include "TeleportActor.h"
 
+#include "ParticleHelper.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -17,49 +18,69 @@ ATeleportActor::ATeleportActor()
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collision"));
 	BoxCollision->SetupAttachment(TeleportMesh);
 	
-	BoxCollision->OnComponentBeginOverlap.AddDynamic(this, &ATeleportActor::BoxCollisionBeginOverlap);	
+	BoxCollision->OnComponentBeginOverlap.AddDynamic(this, &ATeleportActor::BoxCollisionBeginOverlap);
 	BoxCollision->OnComponentEndOverlap.AddDynamic(this, &ATeleportActor::BoxCollisionEndOverlap);
 	
 	ArrowDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow Direction"));
 	ArrowDirection->SetupAttachment(TeleportMesh);
 }
 
-void ATeleportActor::BoxCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ATeleportActor::SpawnNiagara() const
 {
-	if(bTeleportingActor) return;
-	if(!TeleportDestination) return;
-	if(ListTeleportClass.IsEmpty()) return;
-	if(!ListTeleportClass.Contains(OtherActor->GetClass())) return;
-	
-	bTeleportingActor = true;
-
-	if(SoundToPlay) UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundToPlay, GetActorLocation());
-	
 	if(NSTeleport)
 	{
 		UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
-											NSTeleport,
-											TeleportMesh,
-											NAME_None,
-											FVector(0.f),
-											FRotator(0.f),
-											EAttachLocation::Type::KeepRelativeOffset,
-											true);
+			NSTeleport,
+			TeleportMesh,
+			NAME_None,
+			FVector(0.f),
+			FRotator(0.f),
+			EAttachLocation::Type::KeepRelativeOffset,
+			true);
 	}
+}
 
-	if(const ATarea1_TSubclassOffCharacter* Character = Cast<ATarea1_TSubclassOffCharacter>(OtherActor))
+void ATeleportActor::SpawnSound() const
+{
+	if(SoundToPlay) UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundToPlay, GetActorLocation());
+}
+
+void ATeleportActor::SpawnFadeInOut(AActor &OtherActor)
+{
+	if(const ATarea1_TSubclassOffCharacter* Character = Cast<ATarea1_TSubclassOffCharacter>(&OtherActor))
 	{
 		Character->FadeInOutCamera();
 	}
+}
+
+void ATeleportActor::DoTeleport(AActor &OtherActor) const
+{
+	TeleportDestination->SetCanTeleport(false);
+	OtherActor.SetActorLocationAndRotation(TeleportDestination->GetActorLocation(), TeleportDestination->GetActorRotation());
+}
+
+void ATeleportActor::BoxCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                                              UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if(!bCanTeleport) return;
+	if(!TeleportDestination) return;
+	if(AllowedActors.IsEmpty()) return;
+	if(!AllowedActors.Contains(OtherActor->GetClass())) return;
 	
-	OtherActor->SetActorLocationAndRotation(TeleportDestination->GetActorLocation(), TeleportDestination->GetActorRotation());
+	SpawnSound();
+	
+	SpawnNiagara();
+	
+	SpawnFadeInOut(*OtherActor);
+
+	DoTeleport(*OtherActor);
+	
 }
 
 void ATeleportActor::BoxCollisionEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	bTeleportingActor = false;
+	SetCanTeleport(true);
 }
 
 #if WITH_EDITOR
@@ -73,6 +94,7 @@ void ATeleportActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 		{
 			SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TeleportDestination->GetActorLocation()));
 			TeleportDestination->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(TeleportDestination->GetActorLocation(), GetActorLocation()));
+			TeleportDestination->TeleportDestination=this;
 		}
 	}
 }
