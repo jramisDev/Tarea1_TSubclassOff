@@ -44,7 +44,7 @@ void ATeleportActor::SpawnSound() const
 	if(SoundToPlay) UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundToPlay, GetActorLocation());
 }
 
-void ATeleportActor::SpawnFadeInOut(AActor &OtherActor)
+void ATeleportActor::SpawnFadeInOut(AActor& OtherActor)
 {
 	if(const ATarea1_TSubclassOffCharacter* Character = Cast<ATarea1_TSubclassOffCharacter>(&OtherActor))
 	{
@@ -52,7 +52,7 @@ void ATeleportActor::SpawnFadeInOut(AActor &OtherActor)
 	}
 }
 
-void ATeleportActor::DoTeleport(AActor &OtherActor) const
+void ATeleportActor::DoTeleport(AActor& OtherActor) const
 {
 	TeleportDestination->SetCanTeleport(false);
 	OtherActor.SetActorLocationAndRotation(TeleportDestination->GetActorLocation(), TeleportDestination->GetActorRotation());

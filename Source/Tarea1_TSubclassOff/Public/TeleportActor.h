@@ -19,8 +19,8 @@ class TAREA1_TSUBCLASSOFF_API ATeleportActor : public AActor
 	
 	void SpawnNiagara() const;
 	void SpawnSound() const;
-	void SpawnFadeInOut(AActor &OtherActor);
-	void DoTeleport(AActor &OtherActor) const;
+	void SpawnFadeInOut(AActor& OtherActor);
+	void DoTeleport(AActor& OtherActor) const;
 
 public:
 	ATeleportActor();
