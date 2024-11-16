@@ -9,7 +9,7 @@ UAttributeComponent::UAttributeComponent()
 
 UAttributeExercise* UAttributeComponent::GetAttribute(const FName& InAttributeName) const
 {
-	if(InAttributeName.IsValid()) return nullptr;
+	if(!InAttributeName.IsValid()) return nullptr;
 	
 	for(const auto Attribute : Attributes)
 	{
@@ -23,7 +23,7 @@ UAttributeExercise* UAttributeComponent::GetAttribute(const FName& InAttributeNa
 
 void UAttributeComponent::AddAttribute(const FName& InAttributeName, const float InValue)
 {
-	if(InAttributeName.IsValid()) return;
+	if(!InAttributeName.IsValid()) return;
 	if(InValue == -1.0f) return; //Al compilar da un warning indica que INDEX_NONE esta deprecado para floats
 
 	if(HasAttribute(InAttributeName)) return; 
@@ -37,6 +37,8 @@ void UAttributeComponent::AddAttribute(const FName& InAttributeName, const float
 
 bool UAttributeComponent::HasAttribute(const FName& InAttributeName) const
 {
+	if(!InAttributeName.IsValid()) return false;
+	
 	for(const auto Attribute : Attributes)
 	{
 		if(Attribute->GetAttributeName().Compare(InAttributeName))
@@ -49,7 +51,7 @@ bool UAttributeComponent::HasAttribute(const FName& InAttributeName) const
 
 void UAttributeComponent::ModifyAttribute(const FName& InAttributeName, const float InValue)
 {
-	if(InAttributeName.IsValid()) return;
+	if(!InAttributeName.IsValid()) return;
 	if(InValue == -1.0f) return; //Al compilar da un warning indica que INDEX_NONE esta deprecado para floats
 		
 	for(const auto Attribute : Attributes)
