@@ -62,5 +62,3 @@ void UAttributeComponent::ModifyAttribute(const FName& InAttributeName, const fl
 		}
 	}	
 }
-
-

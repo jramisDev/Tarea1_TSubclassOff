@@ -19,8 +19,15 @@ public:
 	UAttributeComponent();
 
 	/* Con UObject */
+	UFUNCTION(CallInEditor, BlueprintCallable)
 	UAttributeExercise* GetAttribute(const FName& InAttributeName) const;
+	
+	UFUNCTION(CallInEditor, BlueprintCallable)
 	void AddAttribute(const FName& InAttributeName, float InValue);
+	
+	UFUNCTION(CallInEditor, BlueprintCallable)
 	bool HasAttribute(const FName& InAttributeName) const;
+	
+	UFUNCTION(CallInEditor, BlueprintCallable)
 	void ModifyAttribute(const FName& InAttributeName, const float InValue);
 };
