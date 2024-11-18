@@ -20,7 +20,7 @@ public:
 
 	/* Con UObject */
 	UFUNCTION(CallInEditor, BlueprintCallable)
-	UAttributeExercise* GetAttribute(const FName& InAttributeName) const;
+	void GetAttribute(const FName& InAttributeName, UAttributeExercise* &InAttribute) const;
 	
 	UFUNCTION(CallInEditor, BlueprintCallable)
 	void AddAttribute(const FName& InAttributeName, float InValue);

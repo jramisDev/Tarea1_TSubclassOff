@@ -7,24 +7,23 @@ UAttributeComponent::UAttributeComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-UAttributeExercise* UAttributeComponent::GetAttribute(const FName& InAttributeName) const
+void UAttributeComponent::GetAttribute(const FName& InAttributeName, UAttributeExercise* &InAttribute) const
 {
-	if(!InAttributeName.IsValid()) return nullptr;
+	if(!InAttributeName.IsValid()) return;
 	
 	for(const auto Attribute : Attributes)
 	{
 		if(Attribute->GetAttributeName().Compare(InAttributeName))
 		{
-			return Attribute;
+			InAttribute = Attribute;
+			return ;
 		}
 	}
-	return nullptr;
 }
 
 void UAttributeComponent::AddAttribute(const FName& InAttributeName, const float InValue)
 {
-	if(!InAttributeName.IsValid()) return;
-	if(InValue == -1.0f) return; //Al compilar da un warning indica que INDEX_NONE esta deprecado para floats
+	if(!InAttributeName.IsValid()) return;	
 
 	if(HasAttribute(InAttributeName)) return; 
 	
@@ -52,7 +51,6 @@ bool UAttributeComponent::HasAttribute(const FName& InAttributeName) const
 void UAttributeComponent::ModifyAttribute(const FName& InAttributeName, const float InValue)
 {
 	if(!InAttributeName.IsValid()) return;
-	if(InValue == -1.0f) return; //Al compilar da un warning indica que INDEX_NONE esta deprecado para floats
 		
 	for(const auto Attribute : Attributes)
 	{

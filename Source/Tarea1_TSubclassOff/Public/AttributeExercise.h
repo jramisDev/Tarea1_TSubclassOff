@@ -9,20 +9,23 @@ class TAREA1_TSUBCLASSOFF_API UAttributeExercise : public UObject
 {
 	GENERATED_BODY()
 
+	UPROPERTY()
 	FName Name;
-	float Value = -1.0f; //Al compilar da un warning indica que INDEX_NONE esta deprecado para floats
+
+	UPROPERTY()
+	float Value = 0;
 
 public:
-	UAttributeExercise(){}
-	UAttributeExercise(const FName& InName, const float InValue)
-	{
-		Name = InName;
-		Value = InValue;
-	}
-	
+
+	UFUNCTION(BlueprintCallable)
 	const FName& GetAttributeName() const { return Name; }
+
+	UFUNCTION(BlueprintCallable)
 	void SetAttributeName(const FName& InName) { Name = InName; }
 
+	UFUNCTION(BlueprintCallable)
 	float GetAttributeValue() const { return Value; }
+
+	UFUNCTION(BlueprintCallable)
 	void SetAttributeValue(const float InValue) { Value = InValue; }
 };
