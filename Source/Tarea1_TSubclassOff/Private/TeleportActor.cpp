@@ -1,5 +1,6 @@
 ﻿#include "TeleportActor.h"
 
+#include "CameraManagerExercise.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -16,9 +17,6 @@ ATeleportActor::ATeleportActor()
 
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collision"));
 	BoxCollision->SetupAttachment(TeleportMesh);
-	
-	BoxCollision->OnComponentBeginOverlap.AddDynamic(this, &ATeleportActor::BoxCollisionBeginOverlap);
-	BoxCollision->OnComponentEndOverlap.AddDynamic(this, &ATeleportActor::BoxCollisionEndOverlap);
 	
 	ArrowDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow Direction"));
 	ArrowDirection->SetupAttachment(TeleportMesh);
@@ -44,18 +42,25 @@ void ATeleportActor::SpawnSound() const
 	if(SoundToPlay) UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundToPlay, GetActorLocation());
 }
 
-void ATeleportActor::SpawnFadeInOut(AActor& OtherActor)
+void ATeleportActor::SpawnFadeInOut(AActor& OtherActor) const
 {
-	if(const ATarea1_TSubclassOffCharacter* Character = Cast<ATarea1_TSubclassOffCharacter>(&OtherActor))
+	if(const ACharacter* Character = Cast<ACharacter>(&OtherActor))
 	{
-		Character->FadeInOutCamera();
+		const int32 IndexPlayer = Cast<APlayerController>(Character->GetController())->GetLocalPlayer()->GetLocalPlayerIndex();
+		
+		if(ACameraManagerExercise* CameraManager = Cast<ACameraManagerExercise>(UGameplayStatics::GetPlayerCameraManager(GetWorld(), IndexPlayer) ))
+		{
+			CameraManager->StartFadeInFadeOut();
+		}
 	}
 }
+	
 
 void ATeleportActor::DoTeleport(AActor& OtherActor) const
 {
 	TeleportDestination->SetCanTeleport(false);
 	OtherActor.SetActorLocationAndRotation(TeleportDestination->GetActorLocation(), TeleportDestination->GetActorRotation());
+	//OtherActor.DisableInput(0);
 }
 
 void ATeleportActor::BoxCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -80,6 +85,14 @@ void ATeleportActor::BoxCollisionEndOverlap(UPrimitiveComponent* OverlappedCompo
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	SetCanTeleport(true);
+}
+
+void ATeleportActor::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	BoxCollision->OnComponentBeginOverlap.AddDynamic(this, &ATeleportActor::BoxCollisionBeginOverlap);
+	BoxCollision->OnComponentEndOverlap.AddDynamic(this, &ATeleportActor::BoxCollisionEndOverlap);
 }
 
 #if WITH_EDITOR

@@ -19,7 +19,7 @@ class TAREA1_TSUBCLASSOFF_API ATeleportActor : public AActor
 	
 	void SpawnNiagara() const;
 	void SpawnSound() const;
-	void SpawnFadeInOut(AActor& OtherActor);
+	void SpawnFadeInOut(AActor& OtherActor) const;
 	void DoTeleport(AActor& OtherActor) const;
 
 public:
@@ -42,6 +42,8 @@ public:
 	void SetCanTeleport(const bool InCanTeleport) { bCanTeleport = InCanTeleport; } 
 	
 protected:
+
+	virtual void BeginPlay() override;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Teleport")
 	UStaticMeshComponent* TeleportMesh;
