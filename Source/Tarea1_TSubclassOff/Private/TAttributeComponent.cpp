@@ -29,7 +29,6 @@ void UTAttributeComponent::GetAttribute(const FName& InAttributeName, float& Out
 void UTAttributeComponent::AddAttribute(const FName& InAttributeName, const float InValue)
 {
 	if(!InAttributeName.IsValid()) return;
-	if(InValue == -1.0f) return; //Al compilar da un warning indica que INDEX_NONE esta deprecado para floats
 
 	if(HasAttribute(InAttributeName)) return; 
 	
@@ -55,7 +54,6 @@ bool UTAttributeComponent::HasAttribute(const FName& InAttributeName)
 void UTAttributeComponent::ModifyAttribute(const FName& InAttributeName, const float InValue)
 {
 	if(!InAttributeName.IsValid()) return;
-	if(InValue == -1.0f) return; //Al compilar da un warning indica que INDEX_NONE esta deprecado para floats
 
 	for(TAttributeExercise<float> Attribute : FloatAttributes)
 	{
